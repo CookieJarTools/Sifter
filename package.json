@@ -1,0 +1,25 @@
+{
+  "name": "com.cookiejartools.sifter",
+  "version": "0.1.0",
+  "displayName": "Sifter",
+  "description": "A console for the Unity editor worth reading. Every part of a stack trace coloured for what it is, any frame clickable, categories nobody had to declare, and a list that survives a recompile.",
+  "unity": "6000.0",
+  "license": "PolyForm-Shield-1.0.0",
+  "author": {
+    "name": "CookieJarTools",
+    "url": "https://github.com/CookieJarTools"
+  },
+  "keywords": [
+    "console",
+    "logging",
+    "debugging",
+    "editor"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CookieJarTools/Sifter"
+  },
+  "documentationUrl": "https://github.com/CookieJarTools/Sifter#readme",
+  "changelogUrl": "https://github.com/CookieJarTools/Sifter/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/CookieJarTools/Sifter/blob/main/LICENSE.md"
+}

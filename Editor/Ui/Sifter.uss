@@ -1,0 +1,1139 @@
+/*
+ * Sifter — quiet and flat, in the manner of Linear: near-black surfaces, hairline rules, small
+ * radii, one indigo accent, and nothing shouting except the thing that went wrong.
+ *
+ * Monospaced throughout, because almost everything in here is code: a time, a class, a method, a
+ * file and a line. In a proportional font none of those line up down the list and a stack is read
+ * one frame at a time. RobotoMono ships inside the editor, so it costs no dependency.
+ *
+ * The colours inside a stack are not set here. They are the point of the tool and are chosen in
+ * the window, so that changing one does not mean editing a stylesheet.
+ */
+
+.sifter-root {
+    flex-grow: 1;
+    background-color: #0d0e11;
+    --sf-surface: #121317;
+    --sf-raised: #1a1c21;
+    --sf-hairline: rgba(255, 255, 255, 0.06);
+    --sf-hairline-strong: rgba(255, 255, 255, 0.11);
+    --sf-hover: rgba(255, 255, 255, 0.035);
+    --sf-selected: rgba(255, 255, 255, 0.06);
+    --sf-text: #d7dae0;
+    --sf-label: #b4b8c0;
+    --sf-muted: #767c87;
+    --sf-faint: #5a606b;
+    --sf-accent: #5e6ad2;
+    --sf-accent-soft: rgba(94, 106, 210, 0.16);
+    --sf-accent-text: #c3c9f7;
+    --sf-error: #f0646a;
+    --sf-warning: #e0a63c;
+    -unity-font-definition: resource("Fonts/RobotoMono/RobotoMono-Regular.ttf");
+    font-size: 12px;
+    color: var(--sf-label);
+}
+
+.sifter-root Label {
+    color: var(--sf-label);
+    -unity-font-definition: resource("Fonts/RobotoMono/RobotoMono-Regular.ttf");
+}
+
+/*
+ * Every rule below is written as ".sifter-root .sifter__thing" rather than just ".sifter__thing".
+ * That is not decoration. ".sifter-root Label" above is a class plus a type, which outranks a bare
+ * class, so a plain ".sifter__row-title { color: ... }" quietly lost to it and every colour in the
+ * window came out as the one default. Keeping the root on the front of each selector puts them all
+ * on the same footing.
+ */
+
+/* ---------------------------------------------------------------- Toolbar */
+
+.sifter-root .sifter__toolbar {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    height: 42px;
+    padding: 0 8px;
+    border-bottom-width: 1px;
+    border-color: var(--sf-hairline);
+    background-color: var(--sf-surface);
+}
+
+.sifter-root .sifter__ghost {
+    height: 24px;
+    margin: 0 3px 0 0;
+    padding: 0 10px;
+    border-width: 0;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--sf-label);
+    -unity-font-definition: resource("Fonts/RobotoMono/RobotoMono-Bold.ttf");
+    font-size: 11px;
+    transition-property: background-color, color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__ghost:hover {
+    background-color: var(--sf-hover);
+    color: var(--sf-text);
+}
+
+/* The three counts sit at the right end, because they are read rather than done. */
+
+.sifter-root .sifter__level {
+    flex-direction: row;
+    align-items: center;
+    height: 24px;
+    min-width: 46px;
+    margin: 0 0 0 4px;
+    padding: 0 8px 0 6px;
+    border-width: 1px;
+    border-radius: 7px;
+    border-color: rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
+    opacity: 0.45;
+    transition-property: background-color, border-color, opacity;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__level:hover {
+    background-color: var(--sf-hover);
+    opacity: 0.8;
+}
+
+.sifter-root .sifter__level--on {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.045);
+    border-color: var(--sf-hairline-strong);
+}
+
+.sifter-root .sifter__level-mark {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-right: 5px;
+}
+
+.sifter-root .sifter__level-count {
+    color: var(--sf-label);
+    font-size: 11px;
+    -unity-text-align: middle-right;
+    flex-grow: 1;
+}
+
+/* ------------------------------------------------------------- Search box */
+
+.sifter-root .sifter__search {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 34px;
+    height: 24px;
+    overflow: hidden;
+    margin: 0 8px;
+    padding: 0 6px 0 9px;
+    border-width: 1px;
+    border-radius: 6px;
+    border-color: var(--sf-hairline-strong);
+    background-color: rgba(255, 255, 255, 0.03);
+    transition-property: background-color, border-color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__search--on {
+    border-color: var(--sf-accent);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.sifter-root .sifter__search-mark {
+    width: 12px;
+    height: 12px;
+    margin-right: 7px;
+    flex-shrink: 0;
+}
+
+.sifter-root .sifter__search-input {
+    flex-grow: 1;
+    margin: 0;
+}
+
+.sifter-root .sifter__search-input > .unity-base-text-field__input {
+    border-width: 0;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--sf-text);
+    font-size: 11px;
+}
+
+.sifter-root .sifter__search-hint {
+    position: absolute;
+    left: 28px;
+    right: 26px;
+    color: var(--sf-muted);
+    font-size: 11px;
+}
+
+.sifter-root .sifter__search-clear {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.07);
+    color: var(--sf-muted);
+    font-size: 11px;
+}
+
+.sifter-root .sifter__search-clear:hover {
+    background-color: rgba(255, 255, 255, 0.13);
+    color: var(--sf-text);
+}
+
+/* ------------------------------------------------------------------- List */
+
+.sifter-root .sifter__list {
+    flex-grow: 1;
+    background-color: #0d0e11;
+}
+
+.sifter-root .sifter__list .unity-collection-view__item {
+    border-width: 0;
+}
+
+.sifter-root .sifter__list .unity-collection-view__item:hover {
+    background-color: var(--sf-hover);
+}
+
+.sifter-root .sifter__list .unity-collection-view__item--selected {
+    background-color: var(--sf-selected);
+}
+
+/* One line, in columns. A second line under the message put the gap inside a row and the gap
+ * between rows within a few pixels of each other, and a list where you cannot tell which line
+ * belongs to which is worse than one that says less. */
+
+.sifter-root .sifter__row {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    height: 100%;
+    overflow: hidden;
+    padding: 0 10px 0 0;
+    border-bottom-width: 1px;
+    border-color: var(--sf-hairline);
+}
+
+.sifter-root .sifter__row--odd {
+    background-color: rgba(255, 255, 255, 0.022);
+}
+
+.sifter-root .sifter__badge {
+    width: 2px;
+    flex-shrink: 0;
+    height: 100%;
+    margin-right: 9px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sifter-root .sifter__badge--warning {
+    background-color: var(--sf-warning);
+}
+
+.sifter-root .sifter__badge--error {
+    background-color: var(--sf-error);
+}
+
+.sifter-root .sifter__badge--compiler {
+    background-color: var(--sf-accent);
+}
+
+.sifter-root .sifter__row-clock {
+    width: 56px;
+    flex-shrink: 0;
+    margin-right: 10px;
+    color: var(--sf-faint);
+    font-size: 11px;
+}
+
+.sifter-root .sifter__row-title {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    color: var(--sf-text);
+    font-size: 11px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+
+.sifter-root .sifter__row-source {
+    flex-shrink: 0;
+    max-width: 320px;
+    margin-left: 14px;
+    color: var(--sf-muted);
+    font-size: 11px;
+    -unity-text-align: middle-right;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sifter-root .sifter__pill {
+    flex-shrink: 0;
+    margin-left: 8px;
+    padding: 0 6px;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.07);
+    color: var(--sf-label);
+    font-size: 10px;
+}
+
+/* ------------------------------------------------------------------ Trace */
+
+.sifter-root .sifter__trace {
+    flex-grow: 1;
+    background-color: var(--sf-surface);
+    border-top-width: 1px;
+    border-color: var(--sf-hairline);
+    overflow: hidden;
+}
+
+.sifter-root .sifter__trace-scroll {
+    flex-grow: 1;
+    padding: 11px 12px;
+}
+
+/* The message gets a box of its own, the same one the stack has. Two boxes read as two things,
+ * which is what they are: what was said, and where it was said from. */
+
+.sifter-root .sifter__message {
+    flex-shrink: 0;
+    color: var(--sf-text);
+    font-size: 12px;
+    white-space: normal;
+    margin-bottom: 9px;
+    padding: 9px;
+    border-width: 1px;
+    border-radius: 8px;
+    border-color: var(--sf-hairline-strong);
+    background-color: rgba(0, 0, 0, 0.22);
+}
+
+/* The stack in a box of its own, so it reads as one thing rather than as more message. */
+
+.sifter-root .sifter__stack {
+    flex-shrink: 0;
+    border-width: 1px;
+    border-radius: 8px;
+    border-color: var(--sf-hairline-strong);
+    background-color: rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+}
+
+.sifter-root .sifter__stack-head {
+    flex-direction: row;
+    align-items: center;
+    height: 26px;
+    margin: 0;
+    padding: 0 9px;
+    border-width: 0;
+    border-bottom-width: 1px;
+    border-radius: 0;
+    border-color: var(--sf-hairline);
+    background-color: rgba(255, 255, 255, 0.022);
+    transition-property: background-color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__stack--shut .sifter__stack-head {
+    border-bottom-width: 0;
+}
+
+.sifter-root .sifter__stack-head:hover {
+    background-color: var(--sf-hover);
+}
+
+/* Two borders on a rotated square. Unity's own foldout arrow has no dark skin version, and
+ * asking for one it does not have logs an error into the console this window is replacing. */
+
+.sifter-root .sifter__stack-caret {
+    width: 5px;
+    height: 5px;
+    flex-shrink: 0;
+    margin: 0 10px 0 2px;
+    border-right-width: 1.5px;
+    border-bottom-width: 1.5px;
+    border-color: var(--sf-muted);
+    rotate: -45deg;
+    transition-property: rotate;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__stack-caret--open {
+    rotate: 45deg;
+}
+
+.sifter-root .sifter__stack-title {
+    color: var(--sf-label);
+    font-size: 11px;
+    -unity-font-definition: resource("Fonts/RobotoMono/RobotoMono-Bold.ttf");
+}
+
+.sifter-root .sifter__stack-count {
+    flex-grow: 1;
+    color: var(--sf-faint);
+    font-size: 10px;
+    -unity-text-align: middle-right;
+}
+
+.sifter-root .sifter__frames {
+    flex-shrink: 0;
+    padding: 4px 0;
+}
+
+.sifter-root .sifter__frames--wrap .sifter__frame {
+    white-space: normal;
+}
+
+.sifter-root .sifter__frame {
+    padding: 3px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 0.5;
+    transition-property: background-color, opacity;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__frame--mine {
+    opacity: 1;
+}
+
+.sifter-root .sifter__frame--dead {
+    opacity: 0.34;
+}
+
+.sifter-root .sifter__frame:hover {
+    background-color: var(--sf-hover);
+    opacity: 1;
+}
+
+.sifter-root .sifter__folded {
+    align-self: flex-start;
+    margin: 3px 0 3px 8px;
+    padding: 3px 10px;
+    border-width: 1px;
+    border-radius: 7px;
+    border-color: var(--sf-accent);
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--sf-accent-text);
+    font-size: 10px;
+    transition-property: background-color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__folded:hover {
+    background-color: var(--sf-accent-soft);
+}
+
+.sifter-root .sifter__trace-empty {
+    color: var(--sf-muted);
+    font-size: 11px;
+}
+
+/* ------------------------------------------------------------ Empty state */
+
+.sifter-root .sifter__empty {
+    position: absolute;
+    top: 42px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: #0d0e11;
+}
+
+.sifter-root .sifter__empty-mark {
+    width: 26px;
+    height: 26px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+}
+
+.sifter-root .sifter__empty-title {
+    color: var(--sf-text);
+    font-size: 12px;
+    -unity-font-definition: resource("Fonts/RobotoMono/RobotoMono-Bold.ttf");
+    margin-bottom: 6px;
+}
+
+.sifter-root .sifter__empty-text {
+    color: var(--sf-muted);
+    font-size: 10px;
+    max-width: 340px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+/* --------------------------------------------------------------- Settings */
+
+.sifter-root .sifter__gear {
+    width: 26px;
+    height: 24px;
+    flex-shrink: 0;
+    margin: 0 0 0 8px;
+    padding: 0;
+    border-width: 0;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0);
+    align-items: center;
+    justify-content: center;
+    transition-property: background-color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__gear:hover {
+    background-color: var(--sf-hover);
+}
+
+.sifter-root .sifter__gear-mark {
+    width: 15px;
+    height: 15px;
+    opacity: 0.72;
+}
+
+.sifter-root .sifter__settings {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #0d0e11;
+}
+
+.sifter-root .sifter__settings-head {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    height: 42px;
+    padding: 0 12px;
+    border-bottom-width: 1px;
+    border-color: var(--sf-hairline);
+    background-color: var(--sf-surface);
+}
+
+.sifter-root .sifter__settings-title {
+    color: var(--sf-text);
+    font-size: 12px;
+    -unity-font-definition: resource("Fonts/RobotoMono/RobotoMono-Bold.ttf");
+}
+
+.sifter-root .sifter__spacer {
+    flex-grow: 1;
+}
+
+/* The one filled button in the window. Everything else is a ghost until you are on it. */
+
+.sifter-root .sifter__primary {
+    height: 24px;
+    margin: 0;
+    padding: 0 14px;
+    border-width: 0;
+    border-radius: 6px;
+    background-color: var(--sf-accent);
+    color: #ffffff;
+    font-size: 11px;
+    -unity-font-definition: resource("Fonts/RobotoMono/RobotoMono-Bold.ttf");
+    transition-property: background-color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__primary:hover {
+    background-color: #6d78dd;
+}
+
+/* Along the bottom, and foldable: the settings are what you came here to change, and once the
+ * colours are right the sample is only taking up room. */
+
+.sifter-root .sifter__sample {
+    flex-shrink: 0;
+    margin: 4px 12px 12px 12px;
+    border-width: 1px;
+    border-radius: 10px;
+    border-color: var(--sf-hairline-strong);
+    background-color: var(--sf-surface);
+    overflow: hidden;
+}
+
+.sifter-root .sifter__sample-head {
+    flex-direction: row;
+    align-items: center;
+    height: 28px;
+    margin: 0;
+    padding: 0 10px;
+    border-width: 0;
+    border-radius: 0;
+    background-color: rgba(255, 255, 255, 0.022);
+    transition-property: background-color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__sample-head:hover {
+    background-color: var(--sf-hover);
+}
+
+.sifter-root .sifter__sample-body {
+    padding: 9px 10px 10px 10px;
+    border-top-width: 1px;
+    border-color: var(--sf-hairline);
+}
+
+.sifter-root .sifter__sample-rows {
+    border-width: 1px;
+    border-radius: 7px;
+    border-color: var(--sf-hairline);
+    background-color: #0d0e11;
+    overflow: hidden;
+}
+
+.sifter-root .sifter__sample-trace {
+    margin-top: 9px;
+    border-top-width: 0;
+    border-radius: 7px;
+    flex-grow: 0;
+    max-height: 190px;
+    overflow: hidden;
+}
+
+.sifter-root .sifter__sample-trace .sifter__trace-scroll {
+    padding: 9px 10px;
+}
+
+.sifter-root .sifter__settings-body {
+    flex-grow: 1;
+}
+
+.sifter-root .sifter__section {
+    margin: 10px 12px 0 12px;
+    padding: 4px 12px 10px 12px;
+    border-width: 1px;
+    border-radius: 10px;
+    border-color: var(--sf-hairline);
+    background-color: var(--sf-surface);
+}
+
+.sifter-root .sifter__section-title {
+    color: var(--sf-label);
+    font-size: 11px;
+    -unity-font-definition: resource("Fonts/RobotoMono/RobotoMono-Bold.ttf");
+    margin: 9px 0 3px 0;
+}
+
+.sifter-root .sifter__option {
+    flex-direction: row;
+    align-items: center;
+    padding: 7px 0;
+    border-top-width: 1px;
+    border-color: var(--sf-hairline);
+}
+
+.sifter-root .sifter__option--wide {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.sifter-root .sifter__option--tight {
+    padding: 4px 0;
+}
+
+.sifter-root .sifter__option-words {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    margin-right: 14px;
+}
+
+.sifter-root .sifter__option-title {
+    color: var(--sf-text);
+    font-size: 11px;
+}
+
+.sifter-root .sifter__option-note {
+    color: var(--sf-muted);
+    font-size: 10px;
+    margin-top: 2px;
+    white-space: normal;
+}
+
+.sifter-root .sifter__option-control {
+    flex-direction: row;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.sifter-root .sifter__option--wide .sifter__option-control {
+    margin-top: 7px;
+}
+
+.sifter-root .sifter__choice {
+    flex-direction: row;
+    padding: 2px;
+    border-radius: 7px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.sifter-root .sifter__segment {
+    height: 20px;
+    margin: 0;
+    padding: 0 11px;
+    border-width: 0;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--sf-muted);
+    font-size: 10px;
+    transition-property: background-color, color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__segment:hover {
+    color: var(--sf-text);
+}
+
+.sifter-root .sifter__segment--on {
+    background-color: var(--sf-accent-soft);
+    color: var(--sf-accent-text);
+}
+
+.sifter-root .sifter__chip {
+    height: 22px;
+    margin: 0 5px 5px 0;
+    padding: 0 10px;
+    border-width: 1px;
+    border-radius: 7px;
+    border-color: var(--sf-hairline-strong);
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--sf-muted);
+    font-size: 10px;
+    transition-property: background-color, color, border-color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__chip:hover {
+    color: var(--sf-text);
+    background-color: var(--sf-hover);
+}
+
+.sifter-root .sifter__chip--on {
+    border-color: rgba(94, 106, 210, 0.45);
+    background-color: var(--sf-accent-soft);
+    color: var(--sf-accent-text);
+}
+
+.sifter-root .sifter__swatch {
+    width: 120px;
+    margin: 0;
+}
+
+.sifter-root .sifter__settings-reset {
+    align-self: flex-start;
+    margin-top: 9px;
+    border-width: 1px;
+    border-color: var(--sf-hairline-strong);
+}
+
+/* ------------------------------------------------------------- Categories */
+
+.sifter-root .sifter__ghost--on {
+    background-color: var(--sf-accent-soft);
+    color: var(--sf-accent-text);
+}
+
+.sifter-root .sifter__popover {
+    position: absolute;
+    width: 240px;
+    max-height: 320px;
+    border-width: 1px;
+    border-radius: 9px;
+    border-color: var(--sf-hairline-strong);
+    background-color: var(--sf-raised);
+    overflow: hidden;
+}
+
+.sifter-root .sifter__popover-head {
+    flex-direction: row;
+    align-items: center;
+    height: 28px;
+    padding: 0 6px 0 10px;
+    border-bottom-width: 1px;
+    border-color: var(--sf-hairline);
+}
+
+.sifter-root .sifter__popover-title {
+    color: var(--sf-label);
+    font-size: 10px;
+    -unity-font-definition: resource("Fonts/RobotoMono/RobotoMono-Bold.ttf");
+}
+
+.sifter-root .sifter__popover-action {
+    height: 19px;
+    margin: 0 0 0 3px;
+    padding: 0 7px;
+    border-width: 0;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--sf-muted);
+    font-size: 10px;
+    transition-property: background-color, color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__popover-action:hover {
+    background-color: var(--sf-hover);
+    color: var(--sf-text);
+}
+
+.sifter-root .sifter__popover-body {
+    flex-grow: 1;
+    padding: 4px;
+}
+
+.sifter-root .sifter__popover-foot {
+    border-top-width: 1px;
+    border-color: var(--sf-hairline);
+    padding: 4px;
+}
+
+.sifter-root .sifter__popover-row {
+    flex-direction: row;
+    align-items: center;
+    height: 24px;
+    margin: 0;
+    padding: 0 7px;
+    border-width: 0;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0);
+    transition-property: background-color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__popover-row:hover {
+    background-color: var(--sf-hover);
+}
+
+.sifter-root .sifter__tick {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+    margin-right: 8px;
+    border-width: 1px;
+    border-radius: 3px;
+    border-color: var(--sf-hairline-strong);
+    background-color: rgba(0, 0, 0, 0.25);
+    transition-property: background-color, border-color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__popover-row--on .sifter__tick {
+    border-color: var(--sf-accent);
+    background-color: var(--sf-accent);
+}
+
+.sifter-root .sifter__popover-name {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    color: var(--sf-muted);
+    font-size: 11px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sifter-root .sifter__popover-row--on .sifter__popover-name {
+    color: var(--sf-text);
+}
+
+.sifter-root .sifter__popover-row--builtin .sifter__popover-name {
+    -unity-font-definition: resource("Fonts/RobotoMono/RobotoMono-Bold.ttf");
+}
+
+.sifter-root .sifter__popover-count {
+    flex-shrink: 0;
+    margin-left: 8px;
+    color: var(--sf-faint);
+    font-size: 10px;
+}
+
+/* A category is marked with a colour of its own. The message colour already means error or
+ * warning, which is the one thing nobody should have to look at twice. */
+
+.sifter-root .sifter__cat {
+    flex-shrink: 0;
+    margin-right: 9px;
+    border-radius: 4px;
+}
+
+.sifter-root .sifter__cat {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border-radius: 4px;
+}
+
+.sifter-root .sifter__cat--named {
+    width: auto;
+    height: auto;
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 10px;
+    max-width: 130px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sifter-root .sifter__popover-name {
+    -unity-text-align: middle-left;
+}
+
+.sifter-root .sifter__section-note {
+    color: var(--sf-muted);
+    font-size: 10px;
+    white-space: normal;
+    margin-bottom: 4px;
+}
+
+.sifter-root .sifter__tints {
+    flex-shrink: 0;
+}
+
+/* Ours, because Unity's is drawn by the editor and no stylesheet reaches it. */
+
+.sifter-root .sifter__tip {
+    position: absolute;
+    padding: 6px 9px;
+    border-width: 1px;
+    border-radius: 7px;
+    border-color: var(--sf-hairline-strong);
+    background-color: #1f2229;
+    color: var(--sf-text);
+    font-size: 11px;
+    white-space: normal;
+}
+
+/* What the selected log is, above it. */
+
+.sifter-root .sifter__trace-head {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    margin-bottom: 9px;
+}
+
+.sifter-root .sifter__trace-tag {
+    flex-shrink: 0;
+    margin-right: 6px;
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 10px;
+}
+
+.sifter-root .sifter__trace-when {
+    flex-shrink: 0;
+    margin-left: 4px;
+    color: var(--sf-faint);
+    font-size: 10px;
+}
+
+.sifter-root .sifter__trace-copy {
+    height: 20px;
+    margin: 0 0 0 4px;
+    padding: 0 9px;
+    border-width: 1px;
+    border-radius: 6px;
+    border-color: var(--sf-hairline-strong);
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--sf-muted);
+    font-size: 10px;
+    transition-property: background-color, color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .sifter__trace-copy:hover {
+    background-color: var(--sf-hover);
+    color: var(--sf-text);
+}
+
+/* ------------------------------------------------------------ Scrollbars */
+
+/* Unity's own are a wide track with an arrow button at each end, drawn in the default grey. Slim,
+ * round, and no arrows: the bar should say where you are and otherwise stay out of the way. */
+
+.sifter-root .unity-scroller {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+.sifter-root .unity-scroller--vertical {
+    width: 11px;
+}
+
+.sifter-root .unity-scroller--horizontal {
+    height: 11px;
+}
+
+.sifter-root .unity-scroller__low-button,
+.sifter-root .unity-scroller__high-button {
+    display: none;
+}
+
+.sifter-root .unity-scroller .unity-base-slider {
+    margin: 0;
+}
+
+.sifter-root .unity-scroller .unity-base-slider__tracker {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    margin: 0;
+}
+
+.sifter-root .unity-scroller .unity-base-slider__dragger {
+    border-width: 0;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.13);
+    transition-property: background-color;
+    transition-duration: 110ms;
+}
+
+.sifter-root .unity-scroller .unity-base-slider__dragger:hover {
+    background-color: rgba(255, 255, 255, 0.26);
+}
+
+.sifter-root .unity-scroller--vertical .unity-base-slider__dragger {
+    width: 7px;
+    left: 2px;
+}
+
+.sifter-root .unity-scroller--horizontal .unity-base-slider__dragger {
+    height: 7px;
+    top: 2px;
+}
+
+/* A little room so a line never ends underneath the bar. */
+
+.sifter-root .sifter__trace-scroll > .unity-scroll-view__content-viewport {
+    padding-right: 3px;
+}
+
+/* ---------------------------------------------------------- Compact mode */
+
+/* For a window docked in a corner, where the padding that makes this readable at full size is the
+ * thing stopping you seeing anything. Same specificity as the rules above, so it wins by being
+ * last in the file: keep this block at the end. */
+
+.sifter-root--compact .sifter__toolbar {
+    height: 32px;
+    padding: 0 6px;
+}
+
+.sifter-root--compact .sifter__ghost {
+    height: 20px;
+    padding: 0 7px;
+    font-size: 10px;
+}
+
+.sifter-root--compact .sifter__level {
+    height: 20px;
+    min-width: 40px;
+    padding: 0 6px 0 5px;
+}
+
+.sifter-root--compact .sifter__level-mark {
+    width: 12px;
+    height: 12px;
+    margin-right: 4px;
+}
+
+.sifter-root--compact .sifter__search {
+    height: 20px;
+    margin: 0 6px;
+}
+
+.sifter-root--compact .sifter__gear {
+    height: 20px;
+    width: 22px;
+    margin-left: 5px;
+}
+
+.sifter-root--compact .sifter__empty {
+    top: 32px;
+}
+
+.sifter-root--compact .sifter__empty-mark {
+    display: none;
+}
+
+.sifter-root--compact .sifter__trace-scroll {
+    padding: 6px 8px;
+}
+
+.sifter-root--compact .sifter__trace-head {
+    margin-bottom: 5px;
+}
+
+/* The list already says when, on every row. */
+
+.sifter-root--compact .sifter__trace-when {
+    display: none;
+}
+
+.sifter-root--compact .sifter__trace-copy {
+    height: 18px;
+    padding: 0 7px;
+}
+
+.sifter-root--compact .sifter__trace-tag {
+    padding: 1px 6px;
+}
+
+/* No box around the message: with the stack boxed underneath, one border is enough to tell them
+ * apart and the other is just eating two lines of height. */
+
+.sifter-root--compact .sifter__message {
+    padding: 0 0 0 1px;
+    margin-bottom: 7px;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.sifter-root--compact .sifter__stack-head {
+    height: 20px;
+    padding: 0 7px;
+}
+
+.sifter-root--compact .sifter__frames {
+    padding: 2px 0;
+}
+
+.sifter-root--compact .sifter__frame {
+    padding: 1px 7px;
+}
+
+.sifter-root--compact .sifter__row {
+    padding-right: 7px;
+}
+
+.sifter-root--compact .sifter__row-clock {
+    width: 50px;
+    margin-right: 7px;
+}
+
+.sifter-root--compact .sifter__cat {
+    margin-right: 7px;
+}
