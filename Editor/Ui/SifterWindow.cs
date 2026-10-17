@@ -25,6 +25,12 @@ namespace CookieJarTools.Sifter.Editor
 		private const float Edge = 6f;
 		private const float Least = 90f;
 
+		/// <summary>
+		/// How near the end still counts as the end. A scroller dragged by hand lands on fractions,
+		/// and asking for the exact bottom means following almost never starts again.
+		/// </summary>
+		private const float Hair = 2f;
+
 		private readonly List<SifterEntry> showing = new List<SifterEntry>();
 
 		private TwoPaneSplitView split;
@@ -42,6 +48,17 @@ namespace CookieJarTools.Sifter.Editor
 		private SifterEntry chosen;
 		private string looking = string.Empty;
 		private bool narrow;
+
+		/// <summary>
+		/// Whether the list is following the end of itself. On to begin with, because a console you
+		/// have to scroll every time something happens is not doing its job.
+		/// </summary>
+		private bool following = true;
+
+		/// <summary>Set while this window is the one doing the scrolling, so it does not read its own move as yours.</summary>
+		private bool scrolling;
+
+		private bool watching;
 
 		[MenuItem("Window/CookieJarTools/Sifter")]
 		public static void Open()
@@ -235,6 +252,7 @@ namespace CookieJarTools.Sifter.Editor
 			list.selectionType = SelectionType.Single;
 			list.selectionChanged += Picked;
 			list.RegisterCallback<GeometryChangedEvent>(Squeezed);
+			Watched();
 			split.Add(list);
 
 			trace = new SifterTrace();
@@ -321,7 +339,6 @@ namespace CookieJarTools.Sifter.Editor
 
 		private void Refill()
 		{
-			var bottom = AtBottom();
 			showing.Clear();
 			Gather();
 			Counts();
@@ -330,7 +347,7 @@ namespace CookieJarTools.Sifter.Editor
 			Reselect();
 			empty.style.display = showing.Count == 0 ? DisplayStyle.Flex : DisplayStyle.None;
 			counted.text = Nothing();
-			Settle(bottom);
+			Settle();
 		}
 
 		/// <summary>
@@ -423,6 +440,10 @@ namespace CookieJarTools.Sifter.Editor
 			SifterSession.Forget();
 			chosen = null;
 			trace.Show(null);
+
+			// An empty list is at its end by definition, and being left not following after a clear
+			// would read as the window having stopped working.
+			following = true;
 			Refill();
 		}
 
@@ -436,28 +457,78 @@ namespace CookieJarTools.Sifter.Editor
 		}
 
 		/// <summary>
-		/// Whether the list was already at the end, which is the only time something arriving should
-		/// drag it there. Scrolling up to read a log and being yanked back down is the worst thing a
-		/// console can do.
+		/// Listens to the scroller so that moving it yourself is what decides whether the list keeps
+		/// following the end.
+		/// <para>
+		/// Following has to be a thing the window remembers rather than something worked out from
+		/// where the list happens to be sitting. A log arriving makes the list longer, which moves
+		/// the end away from you without anybody having touched anything, so a window that only
+		/// looked at the position would stop following the instant it had something to follow.
+		/// </para>
+		/// <para>
+		/// Asked for again once the list has laid out, because the scroller is the list's own and
+		/// subscribing to one that is not built yet would fail quietly, leaving a window that
+		/// follows the end and can never be told to stop.
+		/// </para>
 		/// </summary>
-		private bool AtBottom()
+		private void Watched()
 		{
-			var scroller = list == null ? null : list.Q<ScrollView>();
-			if (scroller == null)
+			var bar = watching ? null : Bar();
+			if (bar == null)
 			{
-				return true;
+				return;
 			}
 
-			var vertical = scroller.verticalScroller;
-			return vertical.highValue <= 0f || vertical.value >= vertical.highValue - 1f;
+			bar.valueChanged += Scrolled;
+			watching = true;
 		}
 
-		private void Settle(bool bottom)
+		private void Scrolled(float where)
 		{
-			if (bottom && showing.Count > 0)
+			if (scrolling)
 			{
-				list.ScrollToItem(showing.Count - 1);
+				return;
 			}
+
+			following = AtEnd();
+		}
+
+		/// <summary>Whether the list is at its end, or short enough to have no end to be away from.</summary>
+		private bool AtEnd()
+		{
+			var bar = Bar();
+			return bar == null || bar.highValue <= 0f || bar.value >= bar.highValue - Hair;
+		}
+
+		private Scroller Bar()
+		{
+			var view = list == null ? null : list.Q<ScrollView>();
+			return view == null ? null : view.verticalScroller;
+		}
+
+		/// <summary>
+		/// Takes the list to the end, if that is where it was following.
+		/// <para>
+		/// The move is marked while it happens. Scrolling raises the same event whoever asked for
+		/// it, and without the mark the window would read its own move as somebody scrolling away
+		/// and stop following at the very moment it started.
+		/// </para>
+		/// </summary>
+		private void Settle()
+		{
+			if (!following || showing.Count == 0)
+			{
+				return;
+			}
+
+			scrolling = true;
+			list.ScrollToItem(showing.Count - 1);
+			list.schedule.Execute(Settled);
+		}
+
+		private void Settled()
+		{
+			scrolling = false;
 		}
 
 		/// <summary>
@@ -479,6 +550,7 @@ namespace CookieJarTools.Sifter.Editor
 		/// </summary>
 		private void Squeezed(GeometryChangedEvent evt)
 		{
+			Watched();
 			var tight = evt.newRect.width < Tight;
 			if (tight == narrow)
 			{

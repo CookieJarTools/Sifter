@@ -4,6 +4,18 @@ All notable changes to Sifter are written down here. The format is
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-10-17
+
+### Fixed
+
+- **The list stopped following new logs for no reason you could see.** It worked out whether to
+  scroll by looking at where the list was sitting just before it refilled, and a log arriving makes
+  the list longer, which moves the end away from you without anybody having touched anything. So it
+  read its own growth as you having scrolled off, and quietly stopped. Following is a thing the
+  window remembers now: on from the moment it opens, off the moment you scroll away yourself, and
+  on again as soon as you scroll back to the end. Clearing the list turns it back on, since an empty
+  list is at its end by definition.
+
 ## [0.1.0] - 2026-10-15
 
 First release.

@@ -1,6 +1,6 @@
 {
   "name": "com.cookiejartools.sifter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Sifter",
   "description": "A console for the Unity editor worth reading. Every part of a stack trace coloured for what it is, any frame clickable, categories nobody had to declare, and a list that survives a recompile.",
   "unity": "6000.0",
